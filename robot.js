@@ -222,17 +222,17 @@ class Robot {
   check_isWall(point){
     // console.log(point)
 
-    if(canvasSize.w-4<point.x && point.x<canvasSize.w ){
+    if(canvasSize.w-lineWidth<point.x && point.x<canvasSize.w ){
       return 1;
     }
-    if(canvasSize.h-4<point.y && point.h<canvasSize.y ){
+    if(canvasSize.h-lineWidth<point.y && point.h<canvasSize.y ){
       return 1;
     }
 
     if(point.type=="r"){
 
       if(this.angle%45===0){
-        point.x+=2
+        point.x+=lineWidth/2
       }
       var col=-1;
       for(var i=0;i<Dobby.wallCols.length;i++){
@@ -243,7 +243,7 @@ class Robot {
       for(var i=0;i<Dobby.area.length;i++){
         // console.log(`col:${col},i:${i}`)
 
-        if(point.y+2===Dobby.area[i][col].cordinate.y){
+        if(point.y+lineWidth/2===Dobby.area[i][col].cordinate.y){
           if(Dobby.area[i][col].walls.top){
             return 1;
           }
@@ -263,8 +263,8 @@ class Robot {
         }
       }
       for(var i=0;i<Dobby.area.length;i++){
-        // console.log(`row:${row},i:${i}`)
-        if(point.x+2===Dobby.area[row][i].cordinate.x){
+        console.log(`row:${row},i:${i}`)
+        if(point.x+lineWidth/2===Dobby.area[row][i].cordinate.x){
           if(Dobby.area[row][i].walls.left){
             return 1;
           }
@@ -277,8 +277,7 @@ class Robot {
   }
   calc_sensor(x1,y1,x2,y2,abs=0){
 
-    let points=this.get_wallPointsAtSightLevel(x1,y1,x2,y2);
-    
+    let points=this.get_wallPointsAtSightLevel(x1,y1,x2,y2);    
     let points0=[];
     for(var i=0;i<points.length;i++){
       if(this.check_isWall(points[i])){
@@ -305,12 +304,12 @@ class Robot {
       }
     }
     if(abs==0){
-      ctx2.beginPath();
-      ctx2.strokeStyle = "#0f0";
-      ctx2.moveTo(x2, y2);
-      ctx2.lineTo(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y);
-      ctx2.stroke();
-      ctx2.closePath();
+      // ctx2.beginPath();
+      // ctx2.strokeStyle = "#0f0";
+      // ctx2.moveTo(x2, y2);
+      // ctx2.lineTo(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y);
+      // ctx2.stroke();
+      // ctx2.closePath();
     }
     else if(abs==1){
       ctx2.beginPath();
@@ -319,7 +318,7 @@ class Robot {
       // console.log(x1,y2)
       // console.log(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y)
       // console.log("------------------")
-      
+
       ctx2.lineTo(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y);
       ctx2.stroke();
       ctx2.closePath();

@@ -88,7 +88,7 @@ function ceilN(num){
   return parseFloat(num.toFixed(2));
 }
 
-const lineWidth=4
+const lineWidth=8
 ctx1.lineWidth = lineWidth;
 ctx2.lineWidth = lineWidth/2;
 
