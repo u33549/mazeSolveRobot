@@ -111,7 +111,14 @@ function deg2Rad(deg){
 function sin(rad){
   return parseFloat(Math.sin(rad).toFixed(10));
 }
-function cos(rad){return parseFloat(Math.cos(rad).toFixed(10))}
+function cos(rad){
+  return parseFloat(Math.cos(rad).toFixed(10))
+}
+function findPrincipalRad(radians) {
+  const normalizedRadians = radians % (2 * Math.PI);
+  const principalRadians = normalizedRadians >= 0 ? normalizedRadians : (2 * Math.PI + normalizedRadians);  
+  return principalRadians;
+}
 
 const lineWidth=4
 ctx1.lineWidth = lineWidth;

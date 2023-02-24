@@ -4,7 +4,7 @@ class Robot {
       w: (Math.sqrt((cellSize.w * cellSize.h) / 4)),
       h: (Math.sqrt((cellSize.w * cellSize.h) / 4)),
     };
-    this.moveSpeed = 30;
+    this.moveSpeed = 100;
     this.rotationSpeed = 0;
     this.angle = deg2Rad(0);
     this.pos = {
@@ -226,10 +226,18 @@ class Robot {
   check_isWall(point){
     // console.log(point)
 
-    if(canvasSize.w-lineWidth<point.x && point.x<canvasSize.w ){
+    if(lineWidth>point.x && point.x>0 ){
       return 1;
     }
-    if(canvasSize.h-lineWidth<point.y && point.h<canvasSize.y ){
+    if(lineWidth>point.y && point.y>0 ){
+      return 1;
+    }
+
+    if(canvasSize.w+lineWidth<point.x && point.x<canvasSize.w ){
+      return 1;
+    }
+
+    if(canvasSize.h-lineWidth<point.y && point.y<canvasSize.h ){
       return 1;
     }
 
@@ -245,8 +253,9 @@ class Robot {
         }
       }
       for(var i=0;i<Dobby.area.length;i++){
+        // console.log(point.x,point.y)
         // console.log(`col:${col},i:${i}`)
-
+        // console.log("----------------------------")
         if(point.y+lineWidth/2===Dobby.area[i][col].cordinate.y){
           if(Dobby.area[i][col].walls.top){
             return 1;
@@ -267,7 +276,10 @@ class Robot {
         }
       }
       for(var i=0;i<Dobby.area.length;i++){
+        // console.log(point.x,point.y)
         // console.log(`row:${row},i:${i}`)
+        // console.log("----------------------------")
+
         if(point.x+lineWidth/2===Dobby.area[row][i].cordinate.x){
           if(Dobby.area[row][i].walls.left){
             return 1;
@@ -305,9 +317,12 @@ class Robot {
         points0[i]["distance"]=distanceBetween2Points(points0[i],{x:x2,y:y2})
       }
     }
-    // console.log(points0)
     let minObj=minObjectArr(points0,"distance");
+    // console.log("--------------------");
+
+    // console.log(points);
     let r=minObj.distance-((1/cos(deg2Rad(rad2Deg(this.angle)%90)))*(lineWidth/2));
+    // console.log("--------------------");
 
 
 
@@ -357,8 +372,22 @@ class Robot {
   }
   set_speed(x){this.speed=x;}
   set_rotationSpeed(x){this.rotationSpeed=x;}
+  set_angle(rad){this.angle=findPrincipalRad(rad);}
   calcMove(){
     this.set_allParams();
+    const rotSpeed=this.rotationSpeed/fps;
+    this.set_angle(this.angle+rotSpeed);
+    this.set_allParams();
+    for (const i in this.absoluteDistance) {
+      if(this.absoluteDistance[i]<0){
+        his.set_angle(this.angle-rotSpeed);
+        break;
+      }
+    }
+    this.set_allParams();
+
+
+
     const speed=this.moveSpeed/fps;
     const angle=(this.angle+deg2Rad(90))*-1;
     const speedForce={
@@ -392,11 +421,11 @@ class Robot {
         yp=-1*this.absoluteDistance.top;
       }
     }
+    console.log(xp,yp)
     this.pos.x+=xp;
     this.pos.y+=yp;
     
-    const rotSpeed=this.rotationSpeed/fps;
-    this.angle+=rotSpeed;
+    
   }
 
 }
