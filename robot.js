@@ -1,19 +1,17 @@
 class Robot {
   constructor() {
     this.dimensions = {
-      w: ceilN(Math.sqrt((cellSize.w * cellSize.h) / 4)),
-      h: ceilN(Math.sqrt((cellSize.w * cellSize.h) / 4)),
+      w: (Math.sqrt((cellSize.w * cellSize.h) / 4)),
+      h: (Math.sqrt((cellSize.w * cellSize.h) / 4)),
     };
-    this.moveSpeed = 0;
+    this.moveSpeed = 30;
     this.rotationSpeed = 0;
-    this.angle = 0;
+    this.angle = deg2Rad(0);
     this.pos = {
-      x: ceilN(
-        (Dobby.area[0][Dobby.startCol].cordinate.x + cellSize.w / 2)
+      x: (
+        ceilN(Dobby.area[0][Dobby.startCol].cordinate.x + cellSize.w / 2)
       ),
-      y: ceilN(
-        (Dobby.area[0][Dobby.startCol].cordinate.y + cellSize.h / 2)
-      ),
+      y: ceilN((Dobby.area[0][Dobby.startCol].cordinate.y + cellSize.h / 2))
     };
     this.sensors = {
       A: 0,
@@ -64,7 +62,7 @@ class Robot {
     ctx2.beginPath();
     ctx2.save();
     ctx2.translate(this.pos.x, this.pos.y);
-    ctx2.rotate((this.angle * Math.PI) / 180);
+    ctx2.rotate(this.angle);
     ctx2.fillStyle = '#f00';
     ctx2.fillRect(
       -this.dimensions.w / 2,
@@ -119,11 +117,11 @@ class Robot {
 
       var nPos = {
         x:
-          (x1 - this.pos.x) * Math.cos((this.angle * Math.PI) / 180) -
-            (y1 - this.pos.y) * Math.sin((this.angle * Math.PI) / 180) +
+          (x1 - this.pos.x) * cos(this.angle) -
+            (y1 - this.pos.y) * sin(this.angle) +
             this.pos.x,
-          y:(x1 - this.pos.x) * Math.sin((this.angle * Math.PI) / 180) +
-            (y1 - this.pos.y) * Math.cos((this.angle * Math.PI) / 180) +
+          y:(x1 - this.pos.x) * sin(this.angle) +
+            (y1 - this.pos.y) * cos(this.angle) +
             this.pos.y
       };
       pos.push(nPos);
@@ -180,25 +178,30 @@ class Robot {
   }
 
   get_wallPointsAtSightLevel(x1,y1,x2,y2){
+
     let points=[];
     for(var i=0;i<Dobby.wallCols.length;i++){
       var point={
         x:Dobby.wallCols[i],
-        y:(((Dobby.wallCols[i]-x1)/(x2-x1))*(y2-y1))+y1,
+        y:findPointOnLine(x1, y1, x2, y2, Dobby.wallCols[i], undefined),
         type:"c"
       }
+      // console.log((((Dobby.wallCols[i]-x1)/(x2-x1))*(y2-y1))+y1)
       points.push(point);
     }
+    // console.log("---------------------")
+    
     for(var i=0;i<Dobby.wallRows.length;i++){
       var point={
-        x:    x1+((x2-x1)*((Dobby.wallRows[i]-y1)/(y2-y1))),
+        x: findPointOnLine(x1, y1, x2, y2, undefined, Dobby.wallRows[i]),
         y:Dobby.wallRows[i],
         type:"r"
 
       }
       points.push(point);
     }
-    let pointsO=[]
+
+    let points0=[]
     for(var i=0;i<points.length;i++){
       if(x1>x2 && x1<points[i].x){         
           continue;
@@ -215,9 +218,10 @@ class Robot {
       if(points[i].x>canvasSize.w || points[i].y>canvasSize.h || points[i].x<0 || points[i].y<0){
         continue;
       }
-      pointsO.push(points[i])
+      points0.push(points[i])
     }
-    return pointsO;
+    // console.log(points0)
+    return points0;
   }
   check_isWall(point){
     // console.log(point)
@@ -231,7 +235,7 @@ class Robot {
 
     if(point.type=="r"){
 
-      if(this.angle%45===0){
+      if(rad2Deg(this.angle)%45===0 && rad2Deg(this.angle)%90!=0){
         point.x+=lineWidth/2
       }
       var col=-1;
@@ -253,7 +257,7 @@ class Robot {
 
     else if(point.type=="c"){
       
-      if(this.angle%45===0){
+      if(rad2Deg(this.angle)%45===0 && rad2Deg(this.angle)%90!=0){
         point.y+=2
       }
       var row=-1;
@@ -263,7 +267,7 @@ class Robot {
         }
       }
       for(var i=0;i<Dobby.area.length;i++){
-        console.log(`row:${row},i:${i}`)
+        // console.log(`row:${row},i:${i}`)
         if(point.x+lineWidth/2===Dobby.area[row][i].cordinate.x){
           if(Dobby.area[row][i].walls.left){
             return 1;
@@ -285,50 +289,49 @@ class Robot {
       }
       
     }
+    
     // console.log(points0)
 
     // points0.forEach(function(e){
     //   ctx2.fillStyle="#0f0";
     //   ctx2.fillRect(e.x-2,e.y-2,4,4)
     // })
-
-    
     
     for(i=0;i<points0.length;i++){
       if(abs){
         points0[i]["distance"]=distanceBetween2Points(points0[i],{x:x1,y:y1})
-
       }
       else{
         points0[i]["distance"]=distanceBetween2Points(points0[i],{x:x2,y:y2})
       }
     }
+    // console.log(points0)
+    let minObj=minObjectArr(points0,"distance");
+    let r=minObj.distance-((1/cos(deg2Rad(rad2Deg(this.angle)%90)))*(lineWidth/2));
+
+
+
+
     if(abs==0){
-      // ctx2.beginPath();
-      // ctx2.strokeStyle = "#0f0";
-      // ctx2.moveTo(x2, y2);
-      // ctx2.lineTo(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y);
-      // ctx2.stroke();
-      // ctx2.closePath();
+      ctx2.beginPath();
+      ctx2.strokeStyle = "#0f0";
+      ctx2.moveTo(x2, y2);
+      ctx2.lineTo(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y);
+      ctx2.stroke();
+      ctx2.closePath();
     }
     else if(abs==1){
       ctx2.beginPath();
       ctx2.strokeStyle = "#00f";
       ctx2.moveTo(x1, y1);
-      // console.log(x1,y2)
-      // console.log(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y)
-      // console.log("------------------")
-
       ctx2.lineTo(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y);
       ctx2.stroke();
       ctx2.closePath();
-
     }
-    let r=undefined;
     if(minObjectArr(points0,"distance").distance<this.sensorLimit){
-      r=minObjectArr(points0,"distance").distance-((1/Math.cos(this.angle))*(lineWidth/2))
+      return r;
     }
-    return r;
+    return undefined;
   }
   set_sensors(){
     this.set_sensorPos();
@@ -355,13 +358,49 @@ class Robot {
   set_speed(x){this.speed=x;}
   set_rotationSpeed(x){this.rotationSpeed=x;}
   calcMove(){
-    let speed=this.speed/fps;
+    this.set_allParams();
+    const speed=this.moveSpeed/fps;
+    const angle=(this.angle+deg2Rad(90))*-1;
+    const speedForce={
+      x:cos(angle)*speed*1,
+      y:sin(angle)*speed*-1
+    }
+    let xp=0;
+    let yp=0;
+    if(speedForce.x>0 && this.absoluteDistance.right>0){
+      xp=speedForce.x;
+      if(this.absoluteDistance.right<Math.abs(speedForce.x)){
+        xp=this.absoluteDistance.right;
+      }
+    }
+    else if(speedForce.x<0 && this.absoluteDistance.right>0){
+      xp=speedForce.x;
+      if(this.absoluteDistance.left<Math.abs(speedForce.x)){
+        xp=-1*this.absoluteDistance.left;
+      }
+    }
+
+    if(speedForce.y>0 && this.absoluteDistance.bottom>0){
+      yp=speedForce.y;
+      if(this.absoluteDistance.bottom<Math.abs(speedForce.y)){
+        yp=this.absoluteDistance.bottom;
+      }
+    }
+    else if(speedForce.y<0 && this.absoluteDistance.top>0){
+      yp=speedForce.y;
+      if(this.absoluteDistance.top<Math.abs(speedForce.y)){
+        yp=-1*this.absoluteDistance.top;
+      }
+    }
+    this.pos.x+=xp;
+    this.pos.y+=yp;
+    
+    const rotSpeed=this.rotationSpeed/fps;
+    this.angle+=rotSpeed;
   }
 
 }
 const Apo = new Robot();
-drawWals();
-Apo.draw();
 
 
 

@@ -87,8 +87,33 @@ function minObjectArr(arr,prop){
 function ceilN(num){
   return parseFloat(num.toFixed(2));
 }
+function findPointOnLine(x1, y1, x2, y2, knownX, knownY) {
+  const m = (y2 - y1) / (x2 - x1);
+  if (knownX !== undefined && knownY === undefined) {
+    const y = m * (knownX - x1) + y1;
+    return y;
+  }
+  if (knownY !== undefined && knownX === undefined) {
+    const x = (knownY - y1) / m + x1;
+    return x;
+  }
 
-const lineWidth=8
+  console.log("Bir bilinmeyen değer belirtmelisiniz (knownX veya knownY)");
+  return null;
+}
+
+function rad2Deg(rad){
+  return rad * (180/Math.PI);
+}
+function deg2Rad(deg){
+  return deg * (Math.PI / 180.0);
+}
+function sin(rad){
+  return parseFloat(Math.sin(rad).toFixed(10));
+}
+function cos(rad){return parseFloat(Math.cos(rad).toFixed(10))}
+
+const lineWidth=4
 ctx1.lineWidth = lineWidth;
 ctx2.lineWidth = lineWidth/2;
 
