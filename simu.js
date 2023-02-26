@@ -53,13 +53,20 @@ function drawWals() {
   ctx1.beginPath();
 
 }
-
+let b=1;
 setInterval(function() {
-  ctx1.clearRect(0, 0, canvasSize.w, canvasSize.h);
+  if(b){
+     ctx1.clearRect(0, 0, canvasSize.w, canvasSize.h);
   ctx2.clearRect(0, 0, canvasSize.w, canvasSize.h);
-
   drawWals();
   Apo.draw();
   Apo.calcMove();
   writeParams();
+  }
+ 
 },1000/fps)
+
+// Apo.draw();
+// drawWals();
+// //Apo.calcMove();
+// writeParams();

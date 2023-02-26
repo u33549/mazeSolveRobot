@@ -5,8 +5,8 @@ class Robot {
       h: (Math.sqrt((cellSize.w * cellSize.h) / 4)),
     };
     this.moveSpeed = 100;
-    this.rotationSpeed = 0;
-    this.angle = deg2Rad(0);
+    this.rotationSpeed = 0.1;
+    this.angle = deg2Rad(45);
     this.pos = {
       x: (
         ceilN(Dobby.area[0][Dobby.startCol].cordinate.x + cellSize.w / 2)
@@ -224,70 +224,47 @@ class Robot {
     return points0;
   }
   check_isWall(point){
-    // console.log(point)
-
-    if(lineWidth>point.x && point.x>0 ){
-      return 1;
-    }
-    if(lineWidth>point.y && point.y>0 ){
-      return 1;
-    }
-
-    if(canvasSize.w+lineWidth<point.x && point.x<canvasSize.w ){
-      return 1;
-    }
-
-    if(canvasSize.h-lineWidth<point.y && point.y<canvasSize.h ){
-      return 1;
-    }
-
+    if(lineWidth>=point.x){return 1;}
+    if(lineWidth>=point.y){return 1;}
+    if(canvasSize.w-lineWidth<=point.x){return 1;}
+    if(canvasSize.h-lineWidth<=point.y){return 1;}
     if(point.type=="r"){
-
-      if(rad2Deg(this.angle)%45===0 && rad2Deg(this.angle)%90!=0){
-        point.x+=lineWidth/2
-      }
-      var col=-1;
+      let col=-1;
       for(var i=0;i<Dobby.wallCols.length;i++){
         if(point.x>Dobby.wallCols[i]){
           col++;
         }
       }
+      col=Math.floor(col/2);
       for(var i=0;i<Dobby.area.length;i++){
-        // console.log(point.x,point.y)
-        // console.log(`col:${col},i:${i}`)
-        // console.log("----------------------------")
-        if(point.y+lineWidth/2===Dobby.area[i][col].cordinate.y){
+        console.log(i,col,point.y)
+        if(Dobby.area[i][col].cordinate.y==point.y || Dobby.area[i][col].cordinate.y==(point.y+4)){
           if(Dobby.area[i][col].walls.top){
             return 1;
-          }
         }
+        }
+          
       }
     }
-
     else if(point.type=="c"){
-      
-      if(rad2Deg(this.angle)%45===0 && rad2Deg(this.angle)%90!=0){
-        point.y+=2
-      }
-      var row=-1;
+      let row=-1;
       for(var i=0;i<Dobby.wallRows.length;i++){
         if(point.y>Dobby.wallRows[i]){
           row++;
         }
       }
-      for(var i=0;i<Dobby.area.length;i++){
-        // console.log(point.x,point.y)
-        // console.log(`row:${row},i:${i}`)
-        // console.log("----------------------------")
+      row=Math.floor(row/2);
 
-        if(point.x+lineWidth/2===Dobby.area[row][i].cordinate.x){
+      for(var i=0;i<Dobby.area[0].length;i++){
+        if(Dobby.area[row][i].cordinate.x==point.x || Dobby.area[row][i].cordinate.x==(point.x+4)){
           if(Dobby.area[row][i].walls.left){
             return 1;
           }
         }
+          
+        
       }
     }
-   
     return 0;
 
   }
@@ -304,10 +281,14 @@ class Robot {
     
     // console.log(points0)
 
-    // points0.forEach(function(e){
-    //   ctx2.fillStyle="#0f0";
-    //   ctx2.fillRect(e.x-2,e.y-2,4,4)
-    // })
+    points.forEach(function(e){
+      ctx2.fillStyle="#0f0";
+      ctx2.fillRect(e.x-1,e.y-1,2,2)
+    })
+    points0.forEach(function(e){
+      ctx2.fillStyle="#00f";
+      ctx2.fillRect(e.x-1,e.y-1,2,2)
+    })
     
     for(i=0;i<points0.length;i++){
       if(abs){
@@ -318,15 +299,8 @@ class Robot {
       }
     }
     let minObj=minObjectArr(points0,"distance");
-    // console.log("--------------------");
 
-    // console.log(points);
-    let r=minObj.distance-((1/cos(deg2Rad(rad2Deg(this.angle)%90)))*(lineWidth/2));
-    // console.log("--------------------");
-
-
-
-
+    let r=minObj.distance;//-((1/cos(deg2Rad(rad2Deg(this.angle)%90)))*(lineWidth/2))
     if(abs==0){
       ctx2.beginPath();
       ctx2.strokeStyle = "#0f0";
@@ -373,12 +347,15 @@ class Robot {
   set_speed(x){this.speed=x;}
   set_rotationSpeed(x){this.rotationSpeed=x;}
   set_angle(rad){this.angle=findPrincipalRad(rad);}
+  check_move(){
+    return;
+  }
   calcMove(){
     this.set_allParams();
     const rotSpeed=this.rotationSpeed/fps;
     this.set_angle(this.angle+rotSpeed);
     this.set_allParams();
-    for (const i in this.absoluteDistance) {
+    for (const i in this.absoluteCorners) {
       if(this.absoluteDistance[i]<0){
         his.set_angle(this.angle-rotSpeed);
         break;
@@ -421,7 +398,7 @@ class Robot {
         yp=-1*this.absoluteDistance.top;
       }
     }
-    console.log(xp,yp)
+    // console.log(xp,yp)
     this.pos.x+=xp;
     this.pos.y+=yp;
     
@@ -430,7 +407,6 @@ class Robot {
 
 }
 const Apo = new Robot();
-
 
 
 

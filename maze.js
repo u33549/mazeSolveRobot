@@ -41,11 +41,15 @@ class Maze {
     this.wallRows=[];
     this.wallCols=[];
     for (var i = 0;i<mazeDimensions.w+1;i++){
-      this.wallCols.push((lineWidth/2)+(cellSize.w*i)+(i*lineWidth))
+      this.wallCols.push((cellSize.w*i)+(i*lineWidth))
+      this.wallCols.push(lineWidth+(cellSize.w*i)+(i*lineWidth))
+
     }
 
     for (var i = 0;i<mazeDimensions.h+1;i++){
-      this.wallRows.push((lineWidth/2)+(cellSize.h*i)+(i*lineWidth))
+      this.wallRows.push((cellSize.h*i)+(i*lineWidth))
+      this.wallRows.push(lineWidth+(cellSize.h*i)+(i*lineWidth))
+
     }
 
   }
