@@ -41,7 +41,7 @@ class Maze {
     this.wallRows=[];
     this.wallCols=[];
     for (var i = 0;i<mazeDimensions.w+1;i++){
-      this.wallCols.push((cellSize.w*i)+(i*lineWidth))
+      this.wallCols.push([(cellSize.w*i)+(i*lineWidth)])
       this.wallCols.push(lineWidth+(cellSize.w*i)+(i*lineWidth))
 
     }

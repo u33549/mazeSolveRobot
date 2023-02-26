@@ -60,6 +60,7 @@ setInterval(function() {
   ctx2.clearRect(0, 0, canvasSize.w, canvasSize.h);
   drawWals();
   Apo.draw();
+  Apo.calcRotation();
   Apo.calcMove();
   writeParams();
   }

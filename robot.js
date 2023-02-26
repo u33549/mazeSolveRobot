@@ -4,8 +4,8 @@ class Robot {
       w: (Math.sqrt((cellSize.w * cellSize.h) / 4)),
       h: (Math.sqrt((cellSize.w * cellSize.h) / 4)),
     };
-    this.moveSpeed = 100;
-    this.rotationSpeed = 0.1;
+    this.moveSpeed = 0;
+    this.rotationSpeed = 0.6;
     this.angle = deg2Rad(45);
     this.pos = {
       x: (
@@ -237,8 +237,8 @@ class Robot {
       }
       col=Math.floor(col/2);
       for(var i=0;i<Dobby.area.length;i++){
-        console.log(i,col,point.y)
-        if(Dobby.area[i][col].cordinate.y==point.y || Dobby.area[i][col].cordinate.y==(point.y+4)){
+        // console.log(i,col,point.y)
+        if(Dobby.area[i][col].cordinate.y==point.y|| Dobby.area[i][col].cordinate.y==(point.y+lineWidth)){
           if(Dobby.area[i][col].walls.top){
             return 1;
         }
@@ -256,7 +256,7 @@ class Robot {
       row=Math.floor(row/2);
 
       for(var i=0;i<Dobby.area[0].length;i++){
-        if(Dobby.area[row][i].cordinate.x==point.x || Dobby.area[row][i].cordinate.x==(point.x+4)){
+        if(Dobby.area[row][i].cordinate.x==point.x || Dobby.area[row][i].cordinate.x==(point.x+lineWidth)){
           if(Dobby.area[row][i].walls.left){
             return 1;
           }
@@ -347,24 +347,28 @@ class Robot {
   set_speed(x){this.speed=x;}
   set_rotationSpeed(x){this.rotationSpeed=x;}
   set_angle(rad){this.angle=findPrincipalRad(rad);}
-  check_move(){
+
+  check_rotation(){
     return;
   }
-  calcMove(){
+  calcRotation(){
     this.set_allParams();
     const rotSpeed=this.rotationSpeed/fps;
     this.set_angle(this.angle+rotSpeed);
     this.set_allParams();
     for (const i in this.absoluteCorners) {
       if(this.absoluteDistance[i]<0){
-        his.set_angle(this.angle-rotSpeed);
+        this.set_angle(this.angle-rotSpeed);
         break;
       }
     }
+  }
+
+  check_move(){
+    return;
+  }
+  calcMove(){
     this.set_allParams();
-
-
-
     const speed=this.moveSpeed/fps;
     const angle=(this.angle+deg2Rad(90))*-1;
     const speedForce={
@@ -373,34 +377,34 @@ class Robot {
     }
     let xp=0;
     let yp=0;
-    if(speedForce.x>0 && this.absoluteDistance.right>0){
-      xp=speedForce.x;
-      if(this.absoluteDistance.right<Math.abs(speedForce.x)){
-        xp=this.absoluteDistance.right;
-      }
-    }
-    else if(speedForce.x<0 && this.absoluteDistance.right>0){
-      xp=speedForce.x;
-      if(this.absoluteDistance.left<Math.abs(speedForce.x)){
-        xp=-1*this.absoluteDistance.left;
-      }
-    }
+    // if(speedForce.x>0 && this.absoluteDistance.right>0){
+    //   xp=speedForce.x;
+    //   if(this.absoluteDistance.right<Math.abs(speedForce.x)){
+    //     xp=this.absoluteDistance.right;
+    //   }
+    // }
+    // else if(speedForce.x<0 && this.absoluteDistance.left>0){
+    //   xp=speedForce.x;
+    //   if(this.absoluteDistance.left<Math.abs(speedForce.x)){
+    //     xp=-1*this.absoluteDistance.left;
+    //   }
+    // }
 
-    if(speedForce.y>0 && this.absoluteDistance.bottom>0){
-      yp=speedForce.y;
-      if(this.absoluteDistance.bottom<Math.abs(speedForce.y)){
-        yp=this.absoluteDistance.bottom;
-      }
-    }
-    else if(speedForce.y<0 && this.absoluteDistance.top>0){
-      yp=speedForce.y;
-      if(this.absoluteDistance.top<Math.abs(speedForce.y)){
-        yp=-1*this.absoluteDistance.top;
-      }
-    }
-    // console.log(xp,yp)
-    this.pos.x+=xp;
-    this.pos.y+=yp;
+    // if(speedForce.y>0 && this.absoluteDistance.bottom>0){
+    //   yp=speedForce.y;
+    //   if(this.absoluteDistance.bottom<Math.abs(speedForce.y)){
+    //     yp=this.absoluteDistance.bottom;
+    //   }
+    // }
+    // else if(speedForce.y<0 && this.absoluteDistance.top>0){
+    //   yp=speedForce.y;
+    //   if(this.absoluteDistance.top<Math.abs(speedForce.y)){
+    //     yp=-1*this.absoluteDistance.top;
+    //   }
+    // }
+    // // console.log(xp,yp)
+    // this.pos.x+=xp;
+    // this.pos.y+=yp;
     
     
   }
