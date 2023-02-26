@@ -5,7 +5,7 @@ class Robot {
       h: (Math.sqrt((cellSize.w * cellSize.h) / 4)),
     };
     this.moveSpeed = 0;
-    this.rotationSpeed = 0.6;
+    this.rotationSpeed = Math.PI/4;
     this.angle = deg2Rad(45);
     this.pos = {
       x: (
@@ -104,8 +104,15 @@ class Robot {
       this.dimensions.w / 10,
       this.dimensions.h / 2
     );
-
     ctx2.restore();
+    this.draw_sensor(this.pos.x,this.pos.y,this.sensorsPos.A.x,this.sensorsPos.A.y);
+    this.draw_sensor(this.pos.x,this.pos.y,this.sensorsPos.B.x,this.sensorsPos.B.y);
+    this.draw_sensor(this.pos.x,this.pos.y,this.sensorsPos.C.x,this.sensorsPos.C.y);
+    this.draw_sensor(this.pos.x,this.pos.y,this.sensorsPos.D.x,this.sensorsPos.D.y);
+    this.draw_sensor(this.absoluteCorners.top.x,this.absoluteCorners.top.y,this.absoluteCorners.top.x,0,1);
+    this.draw_sensor(this.absoluteCorners.bottom.x,this.absoluteCorners.bottom.y,this.absoluteCorners.bottom.x,canvasSize.h,1);
+    this.draw_sensor(this.absoluteCorners.left.x,this.absoluteCorners.left.y,0,this.absoluteCorners.left.y,1);
+    this.draw_sensor(this.absoluteCorners.right.x,this.absoluteCorners.right.y,canvasSize.w,this.absoluteCorners.right.y,1);
   }
 
   set_corners() {
@@ -278,9 +285,6 @@ class Robot {
       }
       
     }
-    
-    // console.log(points0)
-
     points.forEach(function(e){
       ctx2.fillStyle="#0f0";
       ctx2.fillRect(e.x-1,e.y-1,2,2)
@@ -289,7 +293,8 @@ class Robot {
       ctx2.fillStyle="#00f";
       ctx2.fillRect(e.x-1,e.y-1,2,2)
     })
-    
+
+    // let r=minObj.distance;//-((1/cos(deg2Rad(rad2Deg(this.angle)%90)))*(lineWidth/2))
     for(i=0;i<points0.length;i++){
       if(abs){
         points0[i]["distance"]=distanceBetween2Points(points0[i],{x:x1,y:y1})
@@ -299,13 +304,19 @@ class Robot {
       }
     }
     let minObj=minObjectArr(points0,"distance");
-
-    let r=minObj.distance;//-((1/cos(deg2Rad(rad2Deg(this.angle)%90)))*(lineWidth/2))
+    
+    if(minObj.distance<this.sensorLimit){
+      return minObj;
+    }
+    return undefined;
+  }
+  draw_sensor(x1,y1,x2,y2,abs=0){
+    let minObj=this.calc_sensor(x1,y1,x2,y2,abs)
     if(abs==0){
       ctx2.beginPath();
       ctx2.strokeStyle = "#0f0";
       ctx2.moveTo(x2, y2);
-      ctx2.lineTo(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y);
+      ctx2.lineTo(minObj.x,minObj.y);
       ctx2.stroke();
       ctx2.closePath();
     }
@@ -313,28 +324,24 @@ class Robot {
       ctx2.beginPath();
       ctx2.strokeStyle = "#00f";
       ctx2.moveTo(x1, y1);
-      ctx2.lineTo(minObjectArr(points0,"distance").x,minObjectArr(points0,"distance").y);
+      ctx2.lineTo(minObj.x,minObj.y);
       ctx2.stroke();
       ctx2.closePath();
     }
-    if(minObjectArr(points0,"distance").distance<this.sensorLimit){
-      return r;
-    }
-    return undefined;
   }
   set_sensors(){
     this.set_sensorPos();
-    this.sensors.A=this.calc_sensor(this.pos.x,this.pos.y,this.sensorsPos.A.x,this.sensorsPos.A.y);
-    this.sensors.B=this.calc_sensor(this.pos.x,this.pos.y,this.sensorsPos.B.x,this.sensorsPos.B.y);
-    this.sensors.C=this.calc_sensor(this.pos.x,this.pos.y,this.sensorsPos.C.x,this.sensorsPos.C.y);
-    this.sensors.D=this.calc_sensor(this.pos.x,this.pos.y,this.sensorsPos.D.x,this.sensorsPos.D.y);
+    this.sensors.A=this.calc_sensor(this.pos.x,this.pos.y,this.sensorsPos.A.x,this.sensorsPos.A.y).distance;
+    this.sensors.B=this.calc_sensor(this.pos.x,this.pos.y,this.sensorsPos.B.x,this.sensorsPos.B.y).distance;
+    this.sensors.C=this.calc_sensor(this.pos.x,this.pos.y,this.sensorsPos.C.x,this.sensorsPos.C.y).distance;
+    this.sensors.D=this.calc_sensor(this.pos.x,this.pos.y,this.sensorsPos.D.x,this.sensorsPos.D.y).distance;
   }
   set_absoluteDistance() {
     this.set_corners(),
-    this.absoluteDistance.top=this.calc_sensor(this.absoluteCorners.top.x,this.absoluteCorners.top.y,this.absoluteCorners.top.x,0,1);
-    this.absoluteDistance.bottom=this.calc_sensor(this.absoluteCorners.bottom.x,this.absoluteCorners.bottom.y,this.absoluteCorners.bottom.x,canvasSize.h,1);
-    this.absoluteDistance.left=this.calc_sensor(this.absoluteCorners.left.x,this.absoluteCorners.left.y,0,this.absoluteCorners.left.y,1);
-    this.absoluteDistance.right=this.calc_sensor(this.absoluteCorners.right.x,this.absoluteCorners.right.y,canvasSize.w,this.absoluteCorners.right.y,1);
+    this.absoluteDistance.top=this.calc_sensor(this.absoluteCorners.top.x,this.absoluteCorners.top.y,this.absoluteCorners.top.x,0,1).distance;
+    this.absoluteDistance.bottom=this.calc_sensor(this.absoluteCorners.bottom.x,this.absoluteCorners.bottom.y,this.absoluteCorners.bottom.x,canvasSize.h,1).distance;
+    this.absoluteDistance.left=this.calc_sensor(this.absoluteCorners.left.x,this.absoluteCorners.left.y,0,this.absoluteCorners.left.y,1).distance;
+    this.absoluteDistance.right=this.calc_sensor(this.absoluteCorners.right.x,this.absoluteCorners.right.y,canvasSize.w,this.absoluteCorners.right.y,1).distance;
   }
   set_allParams(){
     this.set_cornersWithoutAngel();

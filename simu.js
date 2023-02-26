@@ -56,9 +56,10 @@ function drawWals() {
 let b=1;
 setInterval(function() {
   if(b){
-     ctx1.clearRect(0, 0, canvasSize.w, canvasSize.h);
-  ctx2.clearRect(0, 0, canvasSize.w, canvasSize.h);
+  ctx1.clearRect(0, 0, canvasSize.w, canvasSize.h);
   drawWals();
+  ctx2.clearRect(0, 0, canvasSize.w, canvasSize.h);
+  Apo.set_allParams();
   Apo.draw();
   Apo.calcRotation();
   Apo.calcMove();
